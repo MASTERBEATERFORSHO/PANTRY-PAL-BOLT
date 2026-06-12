@@ -14,7 +14,116 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ingredients: {
+        Row: {
+          base_shelf_life_days: number
+          basic_nutrition_info: Json
+          category: string
+          created_at: string
+          emoji: string
+          id: string
+          name: string
+          optimal_window_end_day: number
+          optimal_window_start_day: number
+          ripeness_applicable: boolean
+          storage_tips: string
+          variant_name: string
+        }
+        Insert: {
+          base_shelf_life_days: number
+          basic_nutrition_info?: Json
+          category: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          name: string
+          optimal_window_end_day: number
+          optimal_window_start_day?: number
+          ripeness_applicable?: boolean
+          storage_tips: string
+          variant_name: string
+        }
+        Update: {
+          base_shelf_life_days?: number
+          basic_nutrition_info?: Json
+          category?: string
+          created_at?: string
+          emoji?: string
+          id?: string
+          name?: string
+          optimal_window_end_day?: number
+          optimal_window_start_day?: number
+          ripeness_applicable?: boolean
+          storage_tips?: string
+          variant_name?: string
+        }
+        Relationships: []
+      }
+      user_pantry: {
+        Row: {
+          created_at: string
+          custom_name: string | null
+          display_name: string
+          emoji: string
+          expiry_date: string
+          id: string
+          ingredient_id: string | null
+          optimal_window_end_day: number
+          optimal_window_start_day: number
+          purchase_date: string
+          quantity: string
+          ripeness: string | null
+          shelf_life_days: number
+          storage_tips: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_name?: string | null
+          display_name: string
+          emoji?: string
+          expiry_date: string
+          id?: string
+          ingredient_id?: string | null
+          optimal_window_end_day: number
+          optimal_window_start_day?: number
+          purchase_date?: string
+          quantity?: string
+          ripeness?: string | null
+          shelf_life_days: number
+          storage_tips?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_name?: string | null
+          display_name?: string
+          emoji?: string
+          expiry_date?: string
+          id?: string
+          ingredient_id?: string | null
+          optimal_window_end_day?: number
+          optimal_window_start_day?: number
+          purchase_date?: string
+          quantity?: string
+          ripeness?: string | null
+          shelf_life_days?: number
+          storage_tips?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_pantry_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
