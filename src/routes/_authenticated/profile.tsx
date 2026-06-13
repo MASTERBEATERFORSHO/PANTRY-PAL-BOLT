@@ -1,32 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ChefHat, Heart, Utensils, Settings, LogOut, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { ChefHat, Heart, Utensils, Settings, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
 });
 
 function ProfilePage() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const [email, setEmail] = useState<string>("");
   const [strict, setStrict] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
-  }, []);
-
-  async function signOut() {
-    await qc.cancelQueries();
-    qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
 
   const sections = [
     { icon: Utensils, label: "Kitchen Equipment", hint: "Pots, pans, appliances" },
@@ -38,10 +20,10 @@ function ProfilePage() {
     <div className="px-5 pt-8 animate-in fade-in slide-in-from-right-2 duration-300">
       <header className="mb-6 flex items-center gap-4">
         <div className="size-14 rounded-full bg-gradient-to-br from-primary to-fresh flex items-center justify-center text-primary-foreground font-display text-2xl font-semibold">
-          {email.charAt(0).toUpperCase() || "🥗"}
+          🥗
         </div>
         <div className="min-w-0">
-          <h1 className="font-display text-xl font-semibold text-foreground truncate">{email || "You"}</h1>
+          <h1 className="font-display text-xl font-semibold text-foreground truncate">You</h1>
           <p className="text-xs text-muted-foreground">PantryPal member</p>
         </div>
       </header>
@@ -75,10 +57,6 @@ function ProfilePage() {
           </button>
         ))}
       </div>
-
-      <Button onClick={signOut} variant="ghost" className="w-full rounded-2xl h-12 text-danger hover:text-danger hover:bg-danger/10">
-        <LogOut className="size-4 mr-2" /> Sign out
-      </Button>
     </div>
   );
 }
