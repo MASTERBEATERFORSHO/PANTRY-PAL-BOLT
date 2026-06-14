@@ -1,13 +1,13 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CountdownBar } from "@/components/pantry/CountdownBar";
-import { usePantry, removePantryItem } from "@/lib/pantry-store";
+import { usePantry, removePantryItem, type PantryItem } from "@/lib/pantry-store";
 import { canonicalName } from "@/lib/recipe-matcher";
 import { AddIngredientSheet } from "@/components/pantry/AddIngredientSheet";
+import { StorageTipPanel, type StorageTipData } from "@/components/pantry/StorageTipPanel";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2, Info, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const searchSchema = z.object({ add: z.coerce.number().optional() });
@@ -21,7 +21,7 @@ function PantryPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
-  const [tipsItem, setTipsItem] = useState<any | null>(null);
+  const [tipsData, setTipsData] = useState<StorageTipData | null>(null);
 
   useEffect(() => {
     if (search.add) {
@@ -35,6 +35,19 @@ function PantryPage() {
   function handleDelete(id: string) {
     removePantryItem(id);
     toast.success("Removed");
+  }
+
+  function openTips(it: PantryItem) {
+    setTipsData({
+      name: it.display_name,
+      emoji: it.emoji,
+      category: it.category ?? null,
+      storage_tips: it.storage_tips,
+      shelf_life_days: it.shelf_life_days,
+      optimal_window_start_day: it.optimal_window_start_day,
+      optimal_window_end_day: it.optimal_window_end_day,
+      isCustom: !it.ingredient_id,
+    });
   }
 
   return (
@@ -59,55 +72,33 @@ function PantryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {items.map((it: any) => (
-            <div key={it.id} className="space-y-2">
-              <CountdownBar
-                item={it}
-                onUseItUp={() =>
-                  navigate({
-                    to: "/recipes",
-                    search: { useUp: canonicalName(it) } as any,
-                  })
-                }
-                trailing={
-                  <div className="flex gap-1 mt-1">
-                    <button
-                      onClick={() => setTipsItem(tipsItem?.id === it.id ? null : it)}
-                      className="size-7 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center"
-                    >
-                      <Info className="size-3.5 text-muted-foreground" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(it.id)}
-                      className="size-7 rounded-full bg-muted hover:bg-danger/10 flex items-center justify-center"
-                    >
-                      <Trash2 className="size-3.5 text-muted-foreground" />
-                    </button>
-                  </div>
-                }
-              />
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-300",
-                  tipsItem?.id === it.id ? "max-h-40 opacity-100" : "max-h-0 opacity-0",
-                )}
-              >
-                <div className="bg-secondary/50 border border-secondary rounded-2xl p-3 ml-14 relative">
-                  <button onClick={() => setTipsItem(null)} className="absolute top-2 right-2 text-secondary-foreground/60 hover:text-secondary-foreground">
-                    <X className="size-3.5" />
-                  </button>
-                  <p className="text-[10px] uppercase tracking-wide font-semibold text-secondary-foreground/70 mb-1">Storage tip</p>
-                  <p className="text-xs text-secondary-foreground leading-relaxed pr-5">
-                    {it.storage_tips || "Store in a cool, dry place."}
-                  </p>
-                </div>
-              </div>
-            </div>
+          {items.map((it) => (
+            <CountdownBar
+              key={it.id}
+              item={it}
+              onOpenTips={() => openTips(it)}
+              onUseItUp={() =>
+                navigate({
+                  to: "/recipes",
+                  search: { useUp: canonicalName(it) } as any,
+                })
+              }
+              trailing={
+                <button
+                  onClick={() => handleDelete(it.id)}
+                  className="mt-1 size-7 rounded-full bg-muted hover:bg-danger/10 flex items-center justify-center"
+                  aria-label="Remove"
+                >
+                  <Trash2 className="size-3.5 text-muted-foreground" />
+                </button>
+              }
+            />
           ))}
         </div>
       )}
 
       <AddIngredientSheet open={addOpen} onOpenChange={setAddOpen} />
+      <StorageTipPanel open={!!tipsData} onClose={() => setTipsData(null)} data={tipsData} />
     </div>
   );
 }

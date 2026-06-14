@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { computeCountdown } from "@/lib/pantry-utils";
-import { Flame } from "lucide-react";
+import { Flame, ChevronRight } from "lucide-react";
 
 export interface CountdownBarItem {
   id: string;
@@ -19,11 +19,13 @@ export function CountdownBar({
   onClick,
   trailing,
   onUseItUp,
+  onOpenTips,
 }: {
   item: CountdownBarItem;
   onClick?: () => void;
   trailing?: React.ReactNode;
   onUseItUp?: () => void;
+  onOpenTips?: () => void;
 }) {
   const info = computeCountdown({
     purchaseDate: item.purchase_date,
@@ -35,14 +37,16 @@ export function CountdownBar({
   const isDanger = info.status === "expired" || info.status === "past";
   const showUseItUp =
     !!onUseItUp && (info.status === "golden" || info.status === "past" || info.status === "expired");
-  const remainingColor =
-    info.status === "expired"
-      ? "bg-danger"
-      : info.status === "past"
-        ? "bg-danger/80"
-        : info.status === "golden"
-          ? "bg-golden"
-          : "bg-fresh";
+
+  // Fixed zone segments along the bar
+  const total = info.totalDays;
+  const goldStart = Math.max(0, info.goldenStartPct);
+  const goldEnd = Math.min(100, info.goldenEndPct);
+  const hasGolden = goldEnd > goldStart;
+  // Red zone = last 15% of life, but at minimum begins where golden ends
+  const redStart = Math.max(goldEnd, 100 - Math.max(15, Math.round((1 / Math.max(total, 1)) * 100)));
+  const markerPct = Math.min(100, Math.max(0, info.pctElapsed));
+  const pulseRed = info.status === "past" || info.status === "expired" || markerPct >= redStart - 5;
 
   return (
     <div
@@ -60,24 +64,36 @@ export function CountdownBar({
           <p className="font-semibold text-sm text-foreground truncate">{item.display_name}</p>
           <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{item.quantity}</span>
         </div>
-        <div className="relative h-3 rounded-full bg-muted overflow-hidden">
-          {/* Golden zone */}
+        <div className="relative h-3 rounded-full overflow-hidden bg-muted">
+          {/* Green zone (start → golden start, or full if no golden) */}
           <div
-            className="absolute inset-y-0 bg-golden/30 border-x border-golden/60"
-            style={{
-              left: `${info.goldenStartPct}%`,
-              width: `${Math.max(0, info.goldenEndPct - info.goldenStartPct)}%`,
-            }}
+            className="absolute inset-y-0 bg-fresh/55"
+            style={{ left: 0, width: `${hasGolden ? goldStart : redStart}%` }}
           />
-          {/* Remaining fill */}
+          {/* Golden zone */}
+          {hasGolden && (
+            <div
+              className="absolute inset-y-0 bg-golden/70"
+              style={{ left: `${goldStart}%`, width: `${Math.max(0, goldEnd - goldStart)}%` }}
+            />
+          )}
+          {/* Red zone */}
           <div
-            className={cn("absolute inset-y-0 left-0 transition-all rounded-r-full", remainingColor)}
-            style={{ width: `${info.pctRemaining}%`, opacity: 0.85 }}
+            className={cn(
+              "absolute inset-y-0 bg-danger/70",
+              pulseRed && "animate-pulse",
+            )}
+            style={{ left: `${redStart}%`, width: `${Math.max(0, 100 - redStart)}%` }}
+          />
+          {/* Dim consumed portion (left of marker) */}
+          <div
+            className="absolute inset-y-0 left-0 bg-foreground/10"
+            style={{ width: `${markerPct}%` }}
           />
           {/* Today marker */}
           <div
-            className="absolute top-0 bottom-0 w-0.5 bg-foreground/60"
-            style={{ left: `${info.pctElapsed}%` }}
+            className="absolute -top-0.5 -bottom-0.5 w-1 rounded-full bg-foreground shadow-md ring-2 ring-card transition-all"
+            style={{ left: `calc(${markerPct}% - 2px)` }}
           />
         </div>
       </div>
@@ -93,6 +109,18 @@ export function CountdownBar({
         <span className="text-[10px] text-muted-foreground">
           {info.status === "golden" ? "peak" : info.daysRemaining <= 0 ? "" : "left"}
         </span>
+        {onOpenTips && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenTips();
+            }}
+            className="size-7 rounded-full bg-muted hover:bg-primary/15 flex items-center justify-center transition-colors"
+            aria-label="Storage tips"
+          >
+            <ChevronRight className="size-4 text-muted-foreground" />
+          </button>
+        )}
         {showUseItUp && (
           <button
             onClick={(e) => {

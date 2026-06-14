@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { CountdownBar } from "@/components/pantry/CountdownBar";
-import { usePantry } from "@/lib/pantry-store";
+import { usePantry, type PantryItem } from "@/lib/pantry-store";
 import { canonicalName } from "@/lib/recipe-matcher";
+import { StorageTipPanel, type StorageTipData } from "@/components/pantry/StorageTipPanel";
 import { Button } from "@/components/ui/button";
 import { Plus, ChefHat, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/")({
   component: HomePage,
@@ -12,6 +14,20 @@ export const Route = createFileRoute("/_authenticated/")({
 function HomePage() {
   const navigate = useNavigate();
   const items = usePantry();
+  const [tipsData, setTipsData] = useState<StorageTipData | null>(null);
+
+  function openTips(it: PantryItem) {
+    setTipsData({
+      name: it.display_name,
+      emoji: it.emoji,
+      category: it.category ?? null,
+      storage_tips: it.storage_tips,
+      shelf_life_days: it.shelf_life_days,
+      optimal_window_start_day: it.optimal_window_start_day,
+      optimal_window_end_day: it.optimal_window_end_day,
+      isCustom: !it.ingredient_id,
+    });
+  }
 
   return (
     <div className="px-5 pt-8 animate-in fade-in slide-in-from-right-2 duration-300">
@@ -58,7 +74,8 @@ function HomePage() {
           {items.map((it) => (
             <CountdownBar
               key={it.id}
-              item={it as any}
+              item={it}
+              onOpenTips={() => openTips(it)}
               onUseItUp={() =>
                 navigate({
                   to: "/recipes",
@@ -69,6 +86,7 @@ function HomePage() {
           ))}
         </div>
       )}
+      <StorageTipPanel open={!!tipsData} onClose={() => setTipsData(null)} data={tipsData} />
     </div>
   );
 }

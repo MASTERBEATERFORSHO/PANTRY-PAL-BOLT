@@ -16,6 +16,7 @@ export interface PantryItem {
   optimal_window_end_day: number;
   expiry_date: string;
   storage_tips?: string | null;
+  category?: string | null;
   created_at: string;
 }
 
@@ -76,6 +77,19 @@ function uid() {
   );
 }
 
+export type ManualCategory = "produce" | "dairy" | "meat" | "pantry" | "cooked";
+
+export const MANUAL_CATEGORY_PRESETS: Record<
+  ManualCategory,
+  { label: string; emoji: string; shelf: number; goldenStart: number; goldenEnd: number; tip: string }
+> = {
+  produce: { label: "Fresh produce", emoji: "🥬", shelf: 5, goldenStart: 1, goldenEnd: 3, tip: "Store in the fridge crisper drawer." },
+  dairy:   { label: "Dairy",         emoji: "🧀", shelf: 7, goldenStart: 1, goldenEnd: 5, tip: "Keep refrigerated, sealed tightly." },
+  meat:    { label: "Meat / Fish",   emoji: "🍖", shelf: 3, goldenStart: 1, goldenEnd: 2, tip: "Refrigerate below 4°C; cook promptly." },
+  pantry:  { label: "Dry / Pantry",  emoji: "🌾", shelf: 180, goldenStart: 0, goldenEnd: 0, tip: "Store in a cool, dry place, sealed." },
+  cooked:  { label: "Cooked / Leftovers", emoji: "🍱", shelf: 3, goldenStart: 0, goldenEnd: 1, tip: "Cool quickly, refrigerate within 2 hours." },
+};
+
 export type AddPayload =
   | {
       kind: "ingredient";
@@ -87,7 +101,7 @@ export type AddPayload =
   | {
       kind: "custom";
       name: string;
-      shelfDays: number;
+      category: ManualCategory;
       quantity: string;
       purchaseDate: string;
     };
@@ -96,30 +110,43 @@ export function addPantryItem(p: AddPayload) {
   ensureHydrated();
   let item: PantryItem;
   if (p.kind === "custom") {
-    const shelf = Math.max(1, p.shelfDays || 7);
+    const preset = MANUAL_CATEGORY_PRESETS[p.category];
+    const shelf = preset.shelf;
     item = {
       id: uid(),
       ingredient_id: null,
       custom_name: p.name,
       display_name: p.name,
-      emoji: "🥗",
+      emoji: preset.emoji,
       quantity: p.quantity,
       purchase_date: p.purchaseDate,
       shelf_life_days: shelf,
-      optimal_window_start_day: Math.floor(shelf * 0.2),
-      optimal_window_end_day: Math.floor(shelf * 0.7),
+      optimal_window_start_day: preset.goldenStart,
+      optimal_window_end_day: preset.goldenEnd,
       expiry_date: toISODate(addDays(new Date(p.purchaseDate), shelf)),
-      storage_tips: "Store in a cool, dry place.",
+      storage_tips: preset.tip,
+      category: preset.label,
       created_at: new Date().toISOString(),
     };
   } else {
     const i = p.ingredient;
     let shelf = i.base_shelf_life_days;
-    const startW = i.optimal_window_start_day;
-    const endW = i.optimal_window_end_day;
+    let startW = i.optimal_window_start_day;
+    let endW = i.optimal_window_end_day;
     if (i.ripeness_applicable) {
-      if (p.ripeness === "Overripe") shelf = Math.max(1, Math.floor(shelf * 0.4));
-      else if (p.ripeness === "Ripe") shelf = Math.max(1, Math.floor(shelf * 0.7));
+      if (p.ripeness === "Unripe") {
+        // +2-3 days, shift golden window later
+        const bump = shelf >= 14 ? 3 : 2;
+        shelf = shelf + bump;
+        startW = startW + bump;
+        endW = Math.min(shelf - 1, endW + bump);
+      } else if (p.ripeness === "Overripe") {
+        // -2 days, golden zone immediate (day 1-2)
+        shelf = Math.max(2, shelf - 2);
+        startW = 0;
+        endW = Math.min(shelf - 1, 2);
+      }
+      // Ripe: leave as-is
     }
     item = {
       id: uid(),
@@ -130,10 +157,11 @@ export function addPantryItem(p: AddPayload) {
       purchase_date: p.purchaseDate,
       ripeness: i.ripeness_applicable ? p.ripeness ?? null : null,
       shelf_life_days: shelf,
-      optimal_window_start_day: Math.min(startW, shelf - 1),
-      optimal_window_end_day: Math.min(endW, shelf),
+      optimal_window_start_day: Math.max(0, Math.min(startW, shelf - 1)),
+      optimal_window_end_day: Math.max(0, Math.min(endW, shelf)),
       expiry_date: toISODate(addDays(new Date(p.purchaseDate), shelf)),
       storage_tips: i.storage_tips,
+      category: i.category,
       created_at: new Date().toISOString(),
     };
   }

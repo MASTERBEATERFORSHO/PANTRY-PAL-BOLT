@@ -3,32 +3,33 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronRight, Plus, Sparkles } from "lucide-react";
+import { Search, ChevronRight, Plus, Clock } from "lucide-react";
 import { toISODate } from "@/lib/pantry-utils";
-import { addPantryItem, searchIngredients } from "@/lib/pantry-store";
+import { addPantryItem, searchIngredients, MANUAL_CATEGORY_PRESETS, type ManualCategory } from "@/lib/pantry-store";
 import type { Ingredient } from "@/lib/ingredients-data";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { StorageTipPanel, type StorageTipData } from "./StorageTipPanel";
 
 const RIPENESS = ["Unripe", "Ripe", "Overripe"] as const;
 
 export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Ingredient | null>(null);
-  const [tipsFor, setTipsFor] = useState<Ingredient | null>(null);
+  const [tipsFor, setTipsFor] = useState<StorageTipData | null>(null);
   const [quantity, setQuantity] = useState("1");
   const [purchaseDate, setPurchaseDate] = useState(toISODate(new Date()));
   const [ripeness, setRipeness] = useState<typeof RIPENESS[number]>("Ripe");
   const [customMode, setCustomMode] = useState(false);
   const [customName, setCustomName] = useState("");
-  const [customShelf, setCustomShelf] = useState("7");
+  const [customCategory, setCustomCategory] = useState<ManualCategory>("produce");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setSearch(""); setSelected(null); setTipsFor(null);
       setQuantity("1"); setPurchaseDate(toISODate(new Date()));
-      setRipeness("Ripe"); setCustomMode(false); setCustomName(""); setCustomShelf("7");
+      setRipeness("Ripe"); setCustomMode(false); setCustomName(""); setCustomCategory("produce");
     }
   }, [open]);
 
@@ -41,7 +42,7 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
         addPantryItem({
           kind: "custom",
           name: customName.trim(),
-          shelfDays: parseInt(customShelf) || 7,
+          category: customCategory,
           quantity,
           purchaseDate,
         });
@@ -67,6 +68,7 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
   const canSubmit = customMode ? customName.trim().length > 0 : !!selected;
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="rounded-t-3xl max-h-[92vh] overflow-y-auto p-0">
         <div className="p-5 pb-8">
@@ -99,65 +101,56 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
                   ) : (
                     results.map((i) => {
                       const isSel = selected?.id === i.id;
-                      const isTipOpen = tipsFor?.id === i.id;
                       return (
-                        <div key={i.id} className="relative">
-                          <button
-                            type="button"
-                            onClick={() => setSelected(i)}
-                            className={cn(
-                              "w-full text-left bg-card border rounded-2xl p-3 flex items-start gap-3 transition-all",
-                              isSel ? "border-primary shadow-md ring-2 ring-primary/20" : "border-border hover:border-primary/40",
-                            )}
-                          >
-                            <div className="size-11 rounded-xl bg-surface-warm flex items-center justify-center text-2xl flex-shrink-0">
-                              {i.emoji}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm text-foreground">{i.variant_name}</p>
-                              <p className="text-xs text-muted-foreground mb-1.5">{i.category}</p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {i.basic_nutrition_info?.calories && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent-foreground">
-                                    {i.basic_nutrition_info.calories} cal
-                                  </span>
-                                )}
-                                {(i.basic_nutrition_info?.vitamins || []).slice(0, 2).map((v: string) => (
-                                  <span key={v} className="text-[10px] px-1.5 py-0.5 rounded-full bg-fresh/15 text-fresh">
-                                    {v}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                              <span className="text-[10px] px-2 py-1 rounded-full bg-golden/20 text-golden-foreground font-semibold whitespace-nowrap">
-                                {formatShelf(i.base_shelf_life_days)}
-                              </span>
-                              <span
-                                role="button"
-                                tabIndex={0}
-                                onClick={(e) => { e.stopPropagation(); setTipsFor(isTipOpen ? null : i); }}
-                                className="size-7 rounded-full bg-muted hover:bg-primary/10 flex items-center justify-center transition-colors"
-                              >
-                                <ChevronRight className={cn("size-4 transition-transform", isTipOpen && "rotate-90")} />
+                        <button
+                          key={i.id}
+                          type="button"
+                          onClick={() => setSelected(i)}
+                          className={cn(
+                            "w-full text-left bg-card border rounded-2xl p-3 flex items-stretch gap-3 transition-all animate-fade-in",
+                            isSel ? "border-primary shadow-md ring-2 ring-primary/20" : "border-border hover:border-primary/40",
+                          )}
+                        >
+                          <div className="size-11 rounded-xl bg-surface-warm flex items-center justify-center text-2xl flex-shrink-0">
+                            {i.emoji}
+                          </div>
+                          <div className="flex-1 min-w-0 flex flex-col">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="font-semibold text-sm text-foreground truncate">{i.variant_name}</p>
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent/25 text-accent-foreground font-medium whitespace-nowrap">
+                                {i.category}
                               </span>
                             </div>
-                          </button>
-                          {/* Storage tip side card */}
-                          <div
-                            className={cn(
-                              "overflow-hidden transition-all duration-300 ease-out",
-                              isTipOpen ? "max-h-40 mt-2 opacity-100 scale-100" : "max-h-0 opacity-0 scale-95",
-                            )}
-                          >
-                            <div className="bg-secondary/60 border border-secondary rounded-2xl p-3 ml-14">
-                              <p className="text-[10px] uppercase tracking-wide text-secondary-foreground/70 font-semibold mb-1 flex items-center gap-1">
-                                <Sparkles className="size-3" /> Storage tip
-                              </p>
-                              <p className="text-xs text-secondary-foreground leading-relaxed">{i.storage_tips}</p>
+                            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+                              {nutritionLine(i)}
+                            </p>
+                            <div className="flex items-end justify-between gap-2 mt-1.5">
+                              <span className="text-[10px] text-muted-foreground/80 flex items-center gap-1">
+                                <Clock className="size-3" /> Shelf life: {formatShelf(i.base_shelf_life_days)}
+                              </span>
                             </div>
                           </div>
-                        </div>
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setTipsFor({
+                                name: i.variant_name,
+                                emoji: i.emoji,
+                                category: i.category,
+                                storage_tips: i.storage_tips,
+                                shelf_life_days: i.base_shelf_life_days,
+                                optimal_window_start_day: i.optimal_window_start_day,
+                                optimal_window_end_day: i.optimal_window_end_day,
+                              });
+                            }}
+                            className="self-center size-8 rounded-full bg-muted hover:bg-primary/15 flex items-center justify-center transition-colors flex-shrink-0"
+                            aria-label="View storage tips"
+                          >
+                            <ChevronRight className="size-4 text-muted-foreground" />
+                          </span>
+                        </button>
                       );
                     })
                   )}
@@ -174,8 +167,30 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
                 <Input value={customName} onChange={(e) => setCustomName(e.target.value)} className="rounded-xl" />
               </div>
               <div className="space-y-1.5">
-                <Label>Shelf life (days)</Label>
-                <Input type="number" min={1} value={customShelf} onChange={(e) => setCustomShelf(e.target.value)} className="rounded-xl" />
+                <Label>Category</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(Object.keys(MANUAL_CATEGORY_PRESETS) as ManualCategory[]).map((k) => {
+                    const p = MANUAL_CATEGORY_PRESETS[k];
+                    const active = customCategory === k;
+                    return (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => setCustomCategory(k)}
+                        className={cn(
+                          "rounded-xl border px-3 py-2 text-left text-sm transition-all flex items-center gap-2",
+                          active ? "border-primary bg-primary/10 ring-2 ring-primary/20" : "border-border bg-card hover:border-primary/40",
+                        )}
+                      >
+                        <span className="text-lg">{p.emoji}</span>
+                        <div className="min-w-0">
+                          <p className="font-medium leading-tight">{p.label}</p>
+                          <p className="text-[10px] text-muted-foreground">~{p.shelf}d</p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setCustomMode(false)} className="text-muted-foreground">
                 ← Back to search
@@ -203,7 +218,7 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
             </div>
             {selected?.ripeness_applicable && (
               <div className="space-y-1.5">
-                <Label>Ripeness</Label>
+                <Label>Ripeness <span className="text-muted-foreground font-normal">(adjusts shelf life)</span></Label>
                 <div className="grid grid-cols-3 gap-2">
                   {RIPENESS.map((r) => (
                     <button
@@ -233,12 +248,22 @@ export function AddIngredientSheet({ open, onOpenChange }: { open: boolean; onOp
         </div>
       </SheetContent>
     </Sheet>
+    <StorageTipPanel open={!!tipsFor} onClose={() => setTipsFor(null)} data={tipsFor} />
+    </>
   );
 }
 
 function formatShelf(days: number): string {
-  if (days >= 365) return `${Math.round(days / 365)} yr`;
-  if (days >= 30) return `${Math.round(days / 30)} mo`;
-  if (days >= 7) return `${Math.round(days / 7)} wk`;
-  return `${days} d`;
+  if (days >= 365) return `~${Math.round(days / 365)} year${days >= 730 ? "s" : ""}`;
+  if (days >= 30) return `~${Math.round(days / 30)} month${days >= 60 ? "s" : ""}`;
+  if (days >= 7) return `~${Math.round(days / 7)} week${days >= 14 ? "s" : ""}`;
+  return `${days} day${days === 1 ? "" : "s"}`;
+}
+
+function nutritionLine(i: Ingredient): string {
+  const parts: string[] = [];
+  if (i.basic_nutrition_info?.calories) parts.push(`${i.basic_nutrition_info.calories} kcal`);
+  const vits = (i.basic_nutrition_info?.vitamins || []).slice(0, 2);
+  for (const v of vits) parts.push(v);
+  return parts.length ? parts.join(" · ") : "Whole food";
 }
