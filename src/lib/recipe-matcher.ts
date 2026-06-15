@@ -2,6 +2,8 @@ import { RECIPES, COMMON_STAPLES, type Recipe, type CookingGoal } from "@/lib/re
 import { INGREDIENTS } from "@/lib/ingredients-data";
 import type { PantryItem } from "@/lib/pantry-store";
 import { computeCountdown } from "@/lib/pantry-utils";
+import type { EquipmentKey, DietaryTag } from "@/lib/preferences-data";
+import { RESTRICTIVE_DIETARY } from "@/lib/preferences-data";
 
 export type MatchMode = "strict" | "flexible";
 
@@ -52,12 +54,51 @@ export interface MatchArgs {
   pantryNames: string[];   // all pantry canonical names (for flexible)
   goals: CookingGoal[];    // empty means "any"
   mode: MatchMode;
+  equipment?: EquipmentKey[];     // user's available equipment
+  dietary?: DietaryTag[];         // user's dietary preferences
+  showAll?: boolean;              // override dietary filtering
+}
+
+export interface MatchResult {
+  matches: RecipeMatch[];
+  equipmentFilteredOut: number;
+  dietaryHidden: number;
+}
+
+function recipeAllowedByEquipment(recipe: Recipe, equipment?: EquipmentKey[]): boolean {
+  if (!equipment || equipment.length === 0) return true;
+  const set = new Set(equipment);
+  return recipe.equipment_needed.every((e) => e === "no-cook" || set.has(e as EquipmentKey));
+}
+
+function recipeAllowedByDiet(recipe: Recipe, dietary?: DietaryTag[]): boolean {
+  if (!dietary || dietary.length === 0 || dietary.includes("No Preference")) return true;
+  const restrictive = dietary.filter((d) => RESTRICTIVE_DIETARY.includes(d));
+  if (restrictive.length === 0) return true;
+  return restrictive.every((d) => recipe.dietary_tags.includes(d));
+}
+
+function dietBoost(recipe: Recipe, dietary?: DietaryTag[]): number {
+  if (!dietary || dietary.length === 0) return 0;
+  return dietary.filter((d) => d !== "No Preference" && recipe.dietary_tags.includes(d)).length;
 }
 
 export function matchRecipes(args: MatchArgs): RecipeMatch[] {
-  const { selectedNames, expiringNames, pantryNames, goals, mode } = args;
+  return matchRecipesDetailed(args).matches;
+}
 
-  const matches: RecipeMatch[] = RECIPES.map((recipe) => {
+export function matchRecipesDetailed(args: MatchArgs): MatchResult {
+  const { selectedNames, expiringNames, pantryNames, goals, mode, equipment, dietary, showAll } = args;
+
+  // Equipment filter first — applies before ingredient matching.
+  const equipmentOk = RECIPES.filter((r) => recipeAllowedByEquipment(r, equipment));
+  const equipmentFilteredOut = RECIPES.length - equipmentOk.length;
+
+  // Dietary filter (skippable via showAll).
+  const afterDiet = showAll ? equipmentOk : equipmentOk.filter((r) => recipeAllowedByDiet(r, dietary));
+  const dietaryHidden = equipmentOk.length - afterDiet.length;
+
+  const matches: RecipeMatch[] = afterDiet.map((recipe) => {
     const matchedRequired = recipe.required_ingredients.filter((r) =>
       includesName(selectedNames, r),
     );
@@ -93,7 +134,8 @@ export function matchRecipes(args: MatchArgs): RecipeMatch[] {
       expiringUsedCount * 10 +
       matchPct * 6 +
       goalMatchCount * 2 -
-      missingIngredients.length * 2.5;
+      missingIngredients.length * 2.5 +
+      dietBoost(recipe, dietary) * 1.5;
 
     return {
       recipe,
@@ -121,5 +163,9 @@ export function matchRecipes(args: MatchArgs): RecipeMatch[] {
     );
   });
 
-  return filtered.sort((a, b) => b.score - a.score).slice(0, 8);
+  return {
+    matches: filtered.sort((a, b) => b.score - a.score).slice(0, 12),
+    equipmentFilteredOut,
+    dietaryHidden,
+  };
 }
