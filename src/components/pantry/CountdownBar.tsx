@@ -64,7 +64,12 @@ export function CountdownBar({
   const daysLabel = info.daysRemaining <= 0 ? "0d" : `${info.daysRemaining}d`;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline justify-between gap-2 px-2">
+        <p className="font-semibold text-sm text-foreground truncate">{item.display_name}</p>
+        <span className="text-[10px] uppercase tracking-wide text-muted-foreground whitespace-nowrap">{item.quantity}</span>
+      </div>
+      <div className="flex items-center gap-2">
       <div
         onClick={onClick}
         className={cn(
@@ -96,24 +101,14 @@ export function CountdownBar({
         )}
 
         {/* Circular emoji embedded at left end of pill */}
-        <div className="absolute left-1.5 top-1.5 bottom-1.5 aspect-square rounded-full bg-card shadow-md flex items-center justify-center text-2xl ring-2 ring-card">
+        <div className="absolute left-1.5 top-1.5 bottom-1.5 aspect-square rounded-full bg-card shadow-md flex items-center justify-center text-2xl ring-2 ring-card z-10">
           {item.emoji}
-        </div>
-
-        {/* Name + quantity */}
-        <div className="absolute left-[68px] top-1/2 -translate-y-1/2 right-[88px] min-w-0">
-          <p className="font-semibold text-sm text-white drop-shadow-sm truncate">
-            {item.display_name}
-          </p>
-          <p className="text-[10px] uppercase tracking-wide text-white/85 truncate">
-            {item.quantity}
-          </p>
         </div>
 
         {/* Days remaining inside fill, right-edge of fill */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 flex items-center gap-1 text-white font-bold text-sm tabular-nums drop-shadow"
-          style={{ left: `calc(${fillPct}% - 56px)` }}
+          className="absolute top-1/2 -translate-y-1/2 flex items-center gap-1 text-white font-bold text-sm tabular-nums drop-shadow z-10"
+          style={{ left: `calc(max(${fillPct}%, 72px) - 52px)` }}
         >
           <Clock className="size-3.5" />
           <span>{daysLabel}</span>
@@ -121,7 +116,7 @@ export function CountdownBar({
       </div>
 
       {/* Trailing controls outside the pill */}
-      <div className="flex flex-col items-center gap-1.5 w-9">
+      <div className="flex items-center gap-1.5">
         {onOpenTips && (
           <button
             onClick={(e) => {
@@ -152,6 +147,7 @@ export function CountdownBar({
           </button>
         )}
         {trailing}
+      </div>
       </div>
     </div>
   );
