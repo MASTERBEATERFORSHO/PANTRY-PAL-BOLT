@@ -22,6 +22,7 @@ function PantryPage() {
   const navigate = useNavigate();
   const [addOpen, setAddOpen] = useState(false);
   const [tipsData, setTipsData] = useState<StorageTipData | null>(null);
+  const [debug, setDebug] = useState(false);
 
   useEffect(() => {
     if (search.add) {
@@ -62,6 +63,15 @@ function PantryPage() {
         </Button>
       </header>
 
+      <div className="mb-4 flex justify-end">
+        <button
+          onClick={() => setDebug((d) => !d)}
+          className="text-[11px] font-mono px-2 py-1 rounded-full border border-border text-muted-foreground hover:bg-card"
+        >
+          {debug ? "Hide" : "Show"} golden-zone debug
+        </button>
+      </div>
+
       {items.length === 0 ? (
         <div className="text-center py-16 px-6 bg-card rounded-3xl border border-dashed">
           <p className="text-4xl mb-3">🧺</p>
@@ -76,6 +86,7 @@ function PantryPage() {
             <CountdownBar
               key={it.id}
               item={it}
+              debug={debug}
               onOpenTips={() => openTips(it)}
               onDiscard={() => handleDelete(it.id)}
               onMarkUsed={() => handleDelete(it.id)}
