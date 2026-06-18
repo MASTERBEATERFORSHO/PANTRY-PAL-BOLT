@@ -23,6 +23,7 @@ export function CountdownBar({
   onOpenTips,
   onDiscard,
   onMarkUsed,
+  debug,
 }: {
   item: CountdownBarItem;
   onClick?: () => void;
@@ -31,6 +32,7 @@ export function CountdownBar({
   onOpenTips?: () => void;
   onDiscard?: () => void;
   onMarkUsed?: () => void;
+  debug?: boolean;
 }) {
   const info = computeCountdown({
     purchaseDate: item.purchase_date,
@@ -147,6 +149,45 @@ export function CountdownBar({
               }}
             />
           </div>
+        )}
+
+        {/* DEBUG: golden window markers + elapsed cursor */}
+        {debug && (
+          <>
+            <div
+              className="absolute top-0 bottom-0 pointer-events-none z-20"
+              style={{ left: `${goldStart}%`, width: 2, background: "#1A1A1A" }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute -top-4 text-[9px] font-mono font-bold text-foreground bg-card px-1 rounded pointer-events-none z-20"
+              style={{ left: `calc(${goldStart}% - 6px)` }}
+            >
+              d{item.optimal_window_start_day}
+            </div>
+            <div
+              className="absolute top-0 bottom-0 pointer-events-none z-20"
+              style={{ left: `${goldEnd}%`, width: 2, background: "#1A1A1A" }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute -bottom-4 text-[9px] font-mono font-bold text-foreground bg-card px-1 rounded pointer-events-none z-20"
+              style={{ left: `calc(${goldEnd}% - 6px)` }}
+            >
+              d{item.optimal_window_end_day}
+            </div>
+            <div
+              className="absolute top-0 bottom-0 pointer-events-none z-20"
+              style={{ left: `${info.pctElapsed}%`, width: 2, background: "#D93025" }}
+              aria-hidden="true"
+            />
+            <div
+              className="absolute -bottom-4 text-[9px] font-mono font-bold text-danger bg-card px-1 rounded pointer-events-none z-20"
+              style={{ left: `calc(${info.pctElapsed}% - 10px)` }}
+            >
+              now d{info.daysSincePurchase}/{info.totalDays}
+            </div>
+          </>
         )}
 
         {/* Circular emoji embedded at left end of pill */}
