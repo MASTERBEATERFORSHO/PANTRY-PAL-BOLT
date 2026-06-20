@@ -58,22 +58,13 @@ export function CountdownBar({
   // lighter "spent" track is revealed behind it.
   const remainingPct = isExpired ? 0 : Math.max(6, pctRemaining);
 
-  // Golden window band — fills the ENTIRE pill area (full height, full width
-  // of the window) in true golden color so it reads as one cohesive element,
-  // not a separate inset band.
+  // Golden window overlay positioned by ingredient data
   const goldStart = Math.max(0, info.goldenStartPct);
   const goldEnd = Math.min(100, info.goldenEndPct);
   const hasGolden =
     !isExpired &&
     item.optimal_window_end_day > item.optimal_window_start_day &&
     goldEnd > goldStart + 0.5;
-
-  // True peak-eating-quality golden color — matches the system's --golden
-  // token (oklch 0.81 0.17 85) for consistency with StorageTipPanel etc.
-  const goldenColor = "oklch(0.81 0.17 85)";
-  // When the item is currently in the golden window, the whole pill is golden-
-  // dominant: blend the urgency fill with gold so the band isn't hidden.
-  const isInGoldenNow = info.status === "golden";
 
   const [removing, setRemoving] = useState(false);
   const handleExpiredAction = (fn?: () => void) => {
@@ -109,31 +100,17 @@ export function CountdownBar({
         )}
         style={{
           // Lighter "spent" track — desaturated tint of current urgency color.
-          // In the golden window the whole track takes a golden tint so the
-          // pill reads as one cohesive golden element, not a band on green.
-          background: isExpired
-            ? "#9E9E9E"
-            : isInGoldenNow && hasGolden
-              ? "color-mix(in oklab, " + goldenColor + " 22%, white)"
-              : `color-mix(in oklab, ${fillColor} 18%, white)`,
+          background: isExpired ? "#9E9E9E" : `color-mix(in oklab, ${fillColor} 18%, white)`,
         }}
       >
-        {/* Filled remaining portion — drains as time elapses.
-            Inside the golden window this layer is translucent so the golden
-            band shows through; the pill stays one cohesive golden shape. */}
+        {/* Filled remaining portion — drains as time elapses */}
         {!isExpired && (
           <div
             className={cn(
-              "absolute inset-y-0 left-0 rounded-full transition-[width,background-color,opacity] duration-500 ease-out",
+              "absolute inset-y-0 left-0 rounded-full transition-[width,background-color] duration-500 ease-out",
               urgency === "red" && "animate-pulse",
             )}
-            style={{
-              width: `${remainingPct}%`,
-              // When actively in the golden window, fade the urgency fill back
-              // so the gold beneath dominates — the pill reads fully golden.
-              background: fillColor,
-              opacity: isInGoldenNow ? 0.32 : 1,
-            }}
+            style={{ width: `${remainingPct}%`, background: fillColor }}
           />
         )}
 
@@ -151,32 +128,24 @@ export function CountdownBar({
           />
         )}
 
-        {/* Golden window band — fills the ENTIRE pill area (full height,
-            full window width) in true golden color. Layered ABOVE the
-            draining fill so the peak-eating window is unmistakably golden. */}
+        {/* Golden zone overlay — amber band with gloss, positioned by shelf data */}
         {hasGolden && (
           <div
-            className="absolute inset-y-0 pointer-events-none overflow-hidden"
+            className="absolute top-2 bottom-2 pointer-events-none overflow-hidden"
             style={{
               left: `${goldStart}%`,
-              width: `${Math.max(4, goldEnd - goldStart)}%`,
-              borderRadius: "9999px",
-              background: goldenColor,
-              // Slightly stronger when currently in the window, dimmer otherwise,
-              // so the band is always visible but "glows" at peak.
-              opacity: isInGoldenNow ? 0.92 : 0.5,
-              boxShadow: isInGoldenNow
-                ? "inset 0 1px 0 rgba(255,255,255,0.4), 0 0 14px oklch(0.81 0.17 85 / 0.45)"
-                : "inset 0 0 0 1px rgba(245, 184, 0, 0.5)",
+              width: `${Math.max(3, goldEnd - goldStart)}%`,
+              borderRadius: "4px",
+              background: "rgba(245, 184, 0, 0.35)",
+              boxShadow: "inset 0 0 0 1px rgba(245, 184, 0, 0.45)",
             }}
             aria-hidden="true"
           >
-            {/* Subtle gloss sweep for a premium pill-like sheen */}
             <div
               className="absolute inset-0"
               style={{
                 background:
-                  "linear-gradient(90deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0) 100%)",
+                  "linear-gradient(90deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%)",
               }}
             />
           </div>

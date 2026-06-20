@@ -5,23 +5,16 @@ export type Ingredient = {
   ripeness_applicable: boolean;
 };
 
-// Golden windows = peak eating-quality period (best flavor + nutrition) within
-// the ingredient's shelf life. Values are in days since purchase, drawn from
-// postharvest research and food-science references:
-//  - UC Davis Postharvest Center produce facts
-//  - Serious Eats / Cook's Illustrated storage testing
-//  - USDA Fridge & Freezer Storage guidance
-//  - PubMed-indexed postharvest nutrition studies (ascorbate retention, etc.)
 export const INGREDIENTS: Ingredient[] = [
   {
     "name": "Apple",
     "variant_name": "Apple",
     "category": "Produce",
     "emoji": "🍎",
-    "base_shelf_life_days": 21,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 14,
-    "storage_tips": "Refrigerate in the crisper drawer, away from leafy greens. Apples keep best at 0–4°C and hold crispness and flavor for ~2 weeks before starches fade and texture softens.",
+    "base_shelf_life_days": 30,
+    "optimal_window_start_day": 2,
+    "optimal_window_end_day": 21,
+    "storage_tips": "Refrigerate in the crisper drawer, away from leafy greens.",
     "basic_nutrition_info": {
       "calories": 95,
       "vitamins": [
@@ -40,7 +33,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 6,
     "optimal_window_start_day": 2,
     "optimal_window_end_day": 4,
-    "storage_tips": "Ripen on counter; once ripe, refrigerate up to 3 more days. Peak eating quality is the 1–2 day window when flesh gives to gentle pressure but is not stringy or brown.",
+    "storage_tips": "Ripen on counter; once ripe, refrigerate up to 3 more days.",
     "basic_nutrition_info": {
       "calories": 234,
       "vitamins": [
@@ -58,9 +51,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🍌",
     "base_shelf_life_days": 9,
-    "optimal_window_start_day": 4,
+    "optimal_window_start_day": 3,
     "optimal_window_end_day": 7,
-    "storage_tips": "Ripen at room temperature, then refrigerate to slow further ripening. Peak sweetness and balanced flavor occur at the yellow-with-brown-freckles stage; the skin blackens in the fridge but flesh stays good.",
+    "storage_tips": "Ripen at room temperature, then refrigerate to slow further ripening.",
     "basic_nutrition_info": {
       "calories": 105,
       "vitamins": [
@@ -77,10 +70,10 @@ export const INGREDIENTS: Ingredient[] = [
     "variant_name": "Banana (Ripe)",
     "category": "Produce",
     "emoji": "🍌",
-    "base_shelf_life_days": 4,
+    "base_shelf_life_days": 5,
     "optimal_window_start_day": 0,
     "optimal_window_end_day": 2,
-    "storage_tips": "Keep at room temperature away from direct sun; refrigerate to extend. Fully ripe (freckled) bananas are at peak sweetness — eat within 1–2 days before flavor flattens and texture turns mushy.",
+    "storage_tips": "Keep at room temperature away from direct sun; refrigerate to extend.",
     "basic_nutrition_info": {
       "calories": 105,
       "vitamins": [
@@ -97,9 +90,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🫑",
     "base_shelf_life_days": 12,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 7,
-    "storage_tips": "Store unwashed in the crisper; wash just before use. Vitamin C and crunch hold well for about a week before peppers soften and lose sweetness.",
+    "optimal_window_start_day": 1,
+    "optimal_window_end_day": 8,
+    "storage_tips": "Store unwashed in the crisper; wash just before use.",
     "basic_nutrition_info": {
       "calories": 31,
       "vitamins": [
@@ -117,8 +110,8 @@ export const INGREDIENTS: Ingredient[] = [
     "emoji": "🍓",
     "base_shelf_life_days": 5,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 2,
-    "storage_tips": "Keep dry and refrigerated; wash only just before eating. Strawberries lose vitamin C and develop mold quickly — eat within 1–2 days of purchase for peak flavor and nutrition.",
+    "optimal_window_end_day": 3,
+    "storage_tips": "Keep dry and refrigerated; wash only just before eating.",
     "basic_nutrition_info": {
       "calories": 32,
       "vitamins": [
@@ -135,9 +128,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🫐",
     "base_shelf_life_days": 10,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 5,
-    "storage_tips": "Store unwashed in original container in the fridge. Blueberries hold quality for about a week refrigerated; bloom (the dusty coating) signals freshness and preserves antioxidants.",
+    "optimal_window_start_day": 1,
+    "optimal_window_end_day": 7,
+    "storage_tips": "Store unwashed in original container in the fridge.",
     "basic_nutrition_info": {
       "calories": 57,
       "vitamins": [
@@ -156,8 +149,8 @@ export const INGREDIENTS: Ingredient[] = [
     "emoji": "🍞",
     "base_shelf_life_days": 6,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 3,
-    "storage_tips": "Keep in a bread box at room temp; freeze slices to extend life. Bread stales (retrogrades) fastest at fridge temps — best eaten within 2–3 days, then freeze.",
+    "optimal_window_end_day": 4,
+    "storage_tips": "Keep in a bread box at room temp; freeze slices to extend life.",
     "basic_nutrition_info": {
       "calories": 80,
       "vitamins": [
@@ -176,7 +169,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 60,
     "optimal_window_start_day": 0,
     "optimal_window_end_day": 30,
-    "storage_tips": "Refrigerate in original wrapper; can be frozen up to 6 months. Salted butter resists rancidity well but peak flavor is within the first month after opening.",
+    "storage_tips": "Refrigerate in original wrapper; can be frozen up to 6 months.",
     "basic_nutrition_info": {
       "calories": 102,
       "vitamins": [
@@ -192,10 +185,10 @@ export const INGREDIENTS: Ingredient[] = [
     "variant_name": "Carrot",
     "category": "Produce",
     "emoji": "🥕",
-    "base_shelf_life_days": 28,
+    "base_shelf_life_days": 30,
     "optimal_window_start_day": 2,
     "optimal_window_end_day": 21,
-    "storage_tips": "Remove green tops; store in a sealed bag in the crisper. Carrots keep their crunch and beta-carotene for weeks if kept cold and humid; peak flavor in the first ~3 weeks.",
+    "storage_tips": "Remove green tops; store in a sealed bag in the crisper.",
     "basic_nutrition_info": {
       "calories": 41,
       "vitamins": [
@@ -215,7 +208,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 21,
     "optimal_window_start_day": 0,
     "optimal_window_end_day": 14,
-    "storage_tips": "Wrap in parchment then loosely in plastic; store in cheese drawer. Cheddar holds flavor and texture for ~2 weeks after opening; flavor peaks in the first week before it dries out.",
+    "storage_tips": "Wrap in parchment then loosely in plastic; store in cheese drawer.",
     "basic_nutrition_info": {
       "calories": 113,
       "vitamins": [
@@ -232,10 +225,10 @@ export const INGREDIENTS: Ingredient[] = [
     "variant_name": "Chicken Breast (raw)",
     "category": "Protein",
     "emoji": "🍗",
-    "base_shelf_life_days": 2,
+    "base_shelf_life_days": 3,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 1,
-    "storage_tips": "Keep on the lowest fridge shelf in a sealed container. USDA guidance: cook or freeze raw chicken within 1–2 days. Peak quality and safety is day-of-purchase — cook as soon as possible.",
+    "optimal_window_end_day": 2,
+    "storage_tips": "Keep on the lowest fridge shelf in a sealed container.",
     "basic_nutrition_info": {
       "calories": 165,
       "vitamins": [
@@ -255,7 +248,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 7,
     "optimal_window_start_day": 1,
     "optimal_window_end_day": 5,
-    "storage_tips": "Wrap in a paper towel and store in the crisper drawer. Cucumbers stay crisp and hydrating for ~4–5 days; below 10°C they suffer chilling injury (water-soaked patches).",
+    "storage_tips": "Wrap in a paper towel and store in the crisper drawer.",
     "basic_nutrition_info": {
       "calories": 16,
       "vitamins": [
@@ -272,9 +265,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Dairy",
     "emoji": "🥚",
     "base_shelf_life_days": 28,
-    "optimal_window_start_day": 0,
+    "optimal_window_start_day": 1,
     "optimal_window_end_day": 21,
-    "storage_tips": "Keep refrigerated in the original carton on a middle shelf. Eggs hold grade-A quality for ~3–5 weeks; flavor and yolk integrity are best in the first 3 weeks.",
+    "storage_tips": "Keep refrigerated in the original carton on a middle shelf.",
     "basic_nutrition_info": {
       "calories": 72,
       "vitamins": [
@@ -294,7 +287,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 60,
     "optimal_window_start_day": 3,
     "optimal_window_end_day": 45,
-    "storage_tips": "Store in a cool, dark, ventilated spot — not the fridge. Garlic's pungent allicin potential stays strong for ~6 weeks before cloves soften and sprout; refrigeration triggers premature sprouting.",
+    "storage_tips": "Store in a cool, dark, ventilated spot — not the fridge.",
     "basic_nutrition_info": {
       "calories": 4,
       "vitamins": [
@@ -313,7 +306,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 21,
     "optimal_window_start_day": 1,
     "optimal_window_end_day": 14,
-    "storage_tips": "Wrap in a paper towel and refrigerate, or freeze whole. Ginger root holds its pungent gingerol and juiciness for ~2 weeks refrigerated before fibering and drying out.",
+    "storage_tips": "Wrap in a paper towel and refrigerate, or freeze whole.",
     "basic_nutrition_info": {
       "calories": 4,
       "vitamins": [
@@ -332,7 +325,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 21,
     "optimal_window_start_day": 1,
     "optimal_window_end_day": 14,
-    "storage_tips": "Refrigerate in the crisper for longest life. Lemons retain peak juice yield and vitamin C for ~2 weeks refrigerated; at room temp they dry out within a week.",
+    "storage_tips": "Refrigerate in the crisper for longest life.",
     "basic_nutrition_info": {
       "calories": 17,
       "vitamins": [
@@ -348,9 +341,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🥬",
     "base_shelf_life_days": 10,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 4,
-    "storage_tips": "Wrap loosely in a damp paper towel inside a perforated bag. Romaine loses crispness and up to 50% of its vitamin C within 3–4 days — eat within 4 days for best quality.",
+    "optimal_window_start_day": 1,
+    "optimal_window_end_day": 7,
+    "storage_tips": "Wrap loosely in a damp paper towel inside a perforated bag.",
     "basic_nutrition_info": {
       "calories": 17,
       "vitamins": [
@@ -370,7 +363,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 7,
     "optimal_window_start_day": 2,
     "optimal_window_end_day": 5,
-    "storage_tips": "Ripen at room temperature; refrigerate once fragrant and soft. Research shows optimum sweetness and texture land ~2–3 days after the climacteric peak — best eaten over a 3-day window once yieldingly soft.",
+    "storage_tips": "Ripen at room temperature; refrigerate once fragrant and soft.",
     "basic_nutrition_info": {
       "calories": 99,
       "vitamins": [
@@ -389,8 +382,8 @@ export const INGREDIENTS: Ingredient[] = [
     "emoji": "🥛",
     "base_shelf_life_days": 7,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 4,
-    "storage_tips": "Store on a middle shelf (not the door) at 4°C or below. Milk's door-storage causes temperature swings; kept properly cold, peak freshness is the first 4 days before flavor sours.",
+    "optimal_window_end_day": 5,
+    "storage_tips": "Store on a middle shelf (not the door) at 4°C or below.",
     "basic_nutrition_info": {
       "calories": 150,
       "vitamins": [
@@ -410,7 +403,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 45,
     "optimal_window_start_day": 3,
     "optimal_window_end_day": 30,
-    "storage_tips": "Store in a cool, dark, well-ventilated place — never with potatoes. Onions hold pungency and firmness for ~4 weeks; after that they soften and lose the sulfur compounds that give them bite.",
+    "storage_tips": "Store in a cool, dark, well-ventilated place — never with potatoes.",
     "basic_nutrition_info": {
       "calories": 40,
       "vitamins": [
@@ -428,8 +421,8 @@ export const INGREDIENTS: Ingredient[] = [
     "emoji": "🧀",
     "base_shelf_life_days": 5,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 2,
-    "storage_tips": "Submerge in water in an airtight container, change water daily. Studies show paneer loses freshness after 2–3 days refrigerated — peak soft, milky texture and flavor is in the first 2 days.",
+    "optimal_window_end_day": 3,
+    "storage_tips": "Submerge in water in an airtight container, change water daily.",
     "basic_nutrition_info": {
       "calories": 265,
       "vitamins": [
@@ -449,7 +442,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 60,
     "optimal_window_start_day": 5,
     "optimal_window_end_day": 45,
-    "storage_tips": "Store in a paper bag in a cool, dark place — not the fridge. Potatoes hold starch quality and resist sprouting for ~6 weeks; refrigeration converts starches to sugars, ruining fry texture.",
+    "storage_tips": "Store in a paper bag in a cool, dark place — not the fridge.",
     "basic_nutrition_info": {
       "calories": 110,
       "vitamins": [
@@ -466,10 +459,10 @@ export const INGREDIENTS: Ingredient[] = [
     "variant_name": "White Rice (uncooked)",
     "category": "Pantry",
     "emoji": "🍚",
-    "base_shelf_life_days": 365,
+    "base_shelf_life_days": 730,
     "optimal_window_start_day": 0,
-    "optimal_window_end_day": 180,
-    "storage_tips": "Store in an airtight container in a cool, dark, dry pantry. White rice holds quality for a year; moisture and pantry pests are the real enemy, so keep it sealed.",
+    "optimal_window_end_day": 365,
+    "storage_tips": "Store in an airtight container in a cool, dark, dry pantry.",
     "basic_nutrition_info": {
       "calories": 205,
       "vitamins": [
@@ -486,9 +479,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🥬",
     "base_shelf_life_days": 7,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 2,
-    "storage_tips": "Store in a damp paper towel inside a perforated bag in the crisper drawer. Mature spinach loses ~80% of its vitamin C within 3 days — eat within 2 days of purchase for peak nutrition.",
+    "optimal_window_start_day": 1,
+    "optimal_window_end_day": 4,
+    "storage_tips": "Store in a damp paper towel inside a perforated bag in the crisper drawer.",
     "basic_nutrition_info": {
       "calories": 23,
       "vitamins": [
@@ -506,9 +499,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🥬",
     "base_shelf_life_days": 9,
-    "optimal_window_start_day": 0,
-    "optimal_window_end_day": 3,
-    "storage_tips": "Stand stems in a glass of water and loosely cover leaves with a bag. Root-on spinach keeps longer with better ascorbate retention — best within 3 days before leaves wilt.",
+    "optimal_window_start_day": 2,
+    "optimal_window_end_day": 6,
+    "storage_tips": "Stand stems in a glass of water and loosely cover leaves with a bag.",
     "basic_nutrition_info": {
       "calories": 23,
       "vitamins": [
@@ -526,9 +519,9 @@ export const INGREDIENTS: Ingredient[] = [
     "category": "Produce",
     "emoji": "🥬",
     "base_shelf_life_days": 6,
-    "optimal_window_start_day": 0,
+    "optimal_window_start_day": 1,
     "optimal_window_end_day": 3,
-    "storage_tips": "Keep in original clamshell with a paper towel to absorb moisture. Baby spinach loses ascorbate more slowly than mature leaves — still best within 2–3 days for peak nutrition and texture.",
+    "storage_tips": "Keep in original clamshell with a paper towel to absorb moisture.",
     "basic_nutrition_info": {
       "calories": 20,
       "vitamins": [
@@ -545,10 +538,10 @@ export const INGREDIENTS: Ingredient[] = [
     "variant_name": "Cherry Tomatoes",
     "category": "Produce",
     "emoji": "🍅",
-    "base_shelf_life_days": 7,
-    "optimal_window_start_day": 1,
-    "optimal_window_end_day": 4,
-    "storage_tips": "Store at room temperature on the counter, away from sun. Cherry tomatoes hit peak flavor volatiles at full color — eat within 2–3 days of fully red; refrigeration kills aroma compounds.",
+    "base_shelf_life_days": 8,
+    "optimal_window_start_day": 2,
+    "optimal_window_end_day": 6,
+    "storage_tips": "Store at room temperature on the counter, away from sun.",
     "basic_nutrition_info": {
       "calories": 18,
       "vitamins": [
@@ -567,7 +560,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 7,
     "optimal_window_start_day": 2,
     "optimal_window_end_day": 5,
-    "storage_tips": "Keep at room temperature stem-side down until fully ripe. Tomatoes reach peak flavor at full ripe color; refrigeration below 13°C permanently halts flavor-volatile production — eat within 2–3 days of peak ripeness.",
+    "storage_tips": "Keep at room temperature stem-side down until fully ripe.",
     "basic_nutrition_info": {
       "calories": 18,
       "vitamins": [
@@ -587,7 +580,7 @@ export const INGREDIENTS: Ingredient[] = [
     "base_shelf_life_days": 14,
     "optimal_window_start_day": 0,
     "optimal_window_end_day": 10,
-    "storage_tips": "Keep refrigerated and tightly sealed after opening. Live probiotic cultures and fresh tang hold best in the first 7–10 days after opening; whey separation is normal and stirrable.",
+    "storage_tips": "Keep refrigerated and tightly sealed after opening.",
     "basic_nutrition_info": {
       "calories": 100,
       "vitamins": [
